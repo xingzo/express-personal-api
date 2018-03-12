@@ -1,15 +1,39 @@
 // This file allows us to seed our application with data
 // simply run: `node seed.js` from the root of this project folder.
 
-// var db = require('./models');
+var db = require('./models');
+var x = 4;
 
-// var new_campsite = {description: "Sharp rocks. Middle of nowhere."}
+var new_project = [
+                  {title: "finDining",
+                  githubLink: "https://github.com/SF-WDI/project1-findining",
+                  screenShotLink: "https://github.com/SF-WDI/project1-findining",
+                  description: "Ruby on Rails Food truck finder app"},
 
-// db.Campsite.create(new_campsite, function(err, campsite){
-//   if (err){
-//     return console.log("Error:", err);
-//   }
+                  {title: "GAConnect",
+                  githubLink: "https://github.com/kjkeaston/ga-connect",
+                  screenShotLink: "https://github.com/SF-WDI/project1-findining",
+                  description: "Ruby on Rails social networking site"},
 
-//   console.log("Created new campsite", campsite._id)
-//   process.exit(); // we're all done! Exit the program.
-// })
+                  {title: "RacerGame",
+                  githubLink: "https://github.com/xingzo/racer-game",
+                  screenShotLink: "https://github.com/SF-WDI/project1-findining",
+                  description: "Javascript Racing Game"},
+
+                  {title: "Trivia Game",
+                githubLink: "https://github.com/Manjilan/trivia-game",
+                screenShotLink: "https://github.com/SF-WDI/project1-findining",
+                description: "Ruby console/terminal trivia game"},
+
+              ]
+
+
+
+  db.Project.create(new_project, function(err, project){
+    if (err){
+      return console.log("Error:", err);
+    }
+
+    console.log("Created new campsite", project._id)
+    process.exit(); // we're all done! Exit the program.
+  });

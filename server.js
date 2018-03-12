@@ -19,7 +19,7 @@ app.use(function(req, res, next) {
  * DATABASE *
  ************/
 
-// var db = require('./models');
+var db = require('./models');
 
 /**********
  * ROUTES *
@@ -77,6 +77,54 @@ app.get('/api/profile', function apiIndex(req, res) {
     skills : [{languages: "javascript, HTML, CSS, jQuery"}, {tools: "bootstrap, github/git"}]
   })
 });
+
+
+//get and show all projects (index)
+app.get('/api/projects', function apiIndex(req, res) {
+  // find all todos in db
+  db.Project.find(function (err, allProjects) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ projects: allProjects });
+    }
+  });
+});
+
+// get one project (show)
+app.get('/api/projects/:id', function (req, res) {
+  // get todo id from url params (`req.params`)
+  var projectId = req.params.id;
+
+  // find todo in db by id
+  db.Project.findOne({ _id: projectId }, function (err, foundProject) {
+    if (err) {
+      if (err.name === "CastError") {
+        res.status(404).json({ error: "Nothing found by this ID." });
+      } else {
+        res.status(500).json({ error: err.message });
+      }
+    } else {
+      res.json(foundProject);
+    }
+  });
+});
+
+// create new project
+app.post('/api/projects', function apiIndex(req, res) {
+ // create new project with form data (`req.body`)
+ var newProject = new db.Project(req.body);
+
+ // save new project in db
+ newProject.save(function (err, savedProject) {
+   if (err) {
+     res.status(500).json({ error: err.message });
+   } else {
+     res.json(savedProject);
+   }
+ });
+});
+
 
 /**********
  * SERVER *
