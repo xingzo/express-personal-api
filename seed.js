@@ -30,6 +30,7 @@ var new_project = [
 
 db.Project.remove({}, function(err, projects) {
   console.log('removed all projects');
+  console.log(new_project);
   db.Project.create(new_project, function(err, project){
     if (err){
       return console.log("Error:", err);

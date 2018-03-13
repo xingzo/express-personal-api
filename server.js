@@ -86,7 +86,7 @@ app.get('/api/projects', function apiIndex(req, res) {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
-      res.json({ projects: allProjects });
+      res.json(allProjects);
     }
   });
 });
