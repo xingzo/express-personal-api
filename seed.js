@@ -25,15 +25,21 @@ var new_project = [
                 screenShotLink: "https://github.com/SF-WDI/project1-findining",
                 description: "Ruby console/terminal trivia game"},
 
-              ]
+              ];
 
 
-
+db.Project.remove({}, function(err, projects) {
+  console.log('removed all projects');
   db.Project.create(new_project, function(err, project){
     if (err){
       return console.log("Error:", err);
     }
 
-    console.log("Created new campsite", project._id)
+    console.log('recreated all projects');
+    console.log("created", new_project.length, "projects");
+
+    // console.log("Created new ", project._id)
     process.exit(); // we're all done! Exit the program.
   });
+
+});

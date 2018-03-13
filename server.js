@@ -91,6 +91,7 @@ app.get('/api/projects', function apiIndex(req, res) {
   });
 });
 
+//********************************************************
 // get one project (show)
 app.get('/api/projects/:id', function (req, res) {
   // get todo id from url params (`req.params`)
@@ -110,7 +111,9 @@ app.get('/api/projects/:id', function (req, res) {
   });
 });
 
-// create new project
+
+//********************************************************
+// create new project (create)
 app.post('/api/projects', function apiIndex(req, res) {
  // create new project with form data (`req.body`)
  var newProject = new db.Project(req.body);
@@ -123,6 +126,52 @@ app.post('/api/projects', function apiIndex(req, res) {
      res.json(savedProject);
    }
  });
+});
+
+//********************************************************
+// delete project
+app.delete('/api/projects/:id' , function (req, res) {
+ // get project id from url params (`req.params`)
+ var projectId = req.params.id;
+
+ // find project in db by id and remove
+ db.Project.findOneAndRemove({ _id: projectId }, function (err, deletedProject) {
+   if (err) {
+     res.status(500).json({ error: err.message });
+   } else {
+     res.json(deletedProject);
+   }
+ });
+});
+
+
+//********************************************************
+// update todo
+app.put('/api/projects/:id', function (req, res) {
+  // get todo id from url params (`req.params`)
+  var projectId = req.params.id;
+
+  // find todo in db by id
+  db.Project.findOne({ _id: projectId }, function (err, foundProject) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      // update the todos's attributes
+      foundProject.title = req.body.title;
+      foundProject.description = req.body.description;
+      foundProject.githubLink = req.body.githubLink;
+      foundProject.screenShotLink = req.body.screenShotLink;
+
+      // save updated todo in db
+      foundProject.save(function (err, savedProject) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+        } else {
+          res.json(savedProject);
+        }
+      });
+    }
+  });
 });
 
 
