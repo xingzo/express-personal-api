@@ -47,7 +47,7 @@ app.get('/api', function apiIndex(req, res) {
   // It would be seriously overkill to save any of this to your database.
   // But you should change almost every line of this response.
   res.json({
-    woopsIForgotToDocumentAllMyEndpoints: true, // CHANGE ME ;)
+    woopsIForgotToDocumentAllMyEndpoints: false, // CHANGE ME ;)
     message: "Welcome to my personal api! Here's what you need to know!",
     documentationUrl: "https://github.com/xingzo/express-personal-api/README.md", // CHANGE ME
     baseUrl: "https://dry-sierra-51475.herokuapp.com/", // CHANGE ME
@@ -79,7 +79,7 @@ app.get('/api/profile', function apiIndex(req, res) {
 });
 
 
-//get and show all projects (index)
+//get all projects (index)
 app.get('/api/projects', function apiIndex(req, res) {
   // find all todos in db
   db.Project.find(function (err, allProjects) {
