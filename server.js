@@ -1,6 +1,10 @@
 // require express and other modules
+const cron = require("node-cron");
+
 var express = require('express'),
     app = express();
+
+const fetch = require('node-fetch');
 
 // parse incoming urlencoded form data
 // and populate the req.body object
@@ -57,6 +61,35 @@ app.get('/api', function apiIndex(req, res) {
       {method: "POST", path: "/api/projects", description: "E.g. Create a new project"} // CHANGE ME
     ]
   })
+});
+
+// gets all the leads
+app.get('/api/leads', async function apiIndex(req, res) {
+  // const url = "https://geophysicalinsights.freshsales.io/api/contacts/view/2000309248?sort=emails&sort_type=asc&page=2";
+  //   // const url = "https://geophysicalinsights.freshsales.io/api/lookup?q=tim@hoolock-consulting.com&f=email&entities=contact";
+  // const response = await fetch(url, {
+  //   credentials: 'include',
+  //   headers: {
+  //     Accept: '*/*',
+  //     Host: 'geophysicalinsights.freshsales.io',
+  //     'accept-encoding': 'gzip, deflate, br',
+  //     Authorization: 'Token token=ruf8KPf1yojVDU8wBczyzg',
+  //     'Content-Type': 'text/plain'
+  //   },
+  // });
+  //
+  // const data = await response.json();
+  //
+  // // console.log('async data', data)
+  // console.log('type of data', typeof data)
+  // console.log('type of response', typeof response)
+
+  // console.log('data.meta', data.meta)
+
+  let duplicates = await fetchAllLeads();
+  console.log(duplicates)
+  res.json(duplicates)
+
 });
 
 app.get('/api/profile', function apiIndex(req, res) {
@@ -173,6 +206,156 @@ app.put('/api/projects/:id', function (req, res) {
     }
   });
 });
+
+/**********
+ * FIND DUPLICATES *
+ **********/
+const findDuplicates = (list, type) =>{
+
+  let emails = {};
+  let dups = {};
+
+  // //loop through the list
+  // list.forEach((person) =>{
+  //   //find the active email
+  //   for(let i = 0; i < person.emails.length; i++){
+  //     if(person.emails[i].is_primary === true){
+  //       let email = person.emails[i].value;
+  //       //if it already exists, we found a duplicate
+  //       if(emails[email]){
+  //         emails[email]++;
+  //         dups[email] = 0;
+  //       }else{
+  //         emails[email] = 1;
+  //       }
+  //
+  //     }
+  //   }
+  // })
+
+
+  //loop through the list
+  list.forEach((person) =>{
+    //find the active email
+    let email = person.email;
+    console.log(email)
+
+    if(emails[email]){
+      emails[email]++;
+      dups[email] = 0;
+    }else{
+      emails[email] = 1;
+    }
+
+  })
+
+  let keys = Object.keys(dups);
+
+  console.log("here are the dups from contacts");
+
+  keys.forEach((key) =>{
+    console.log(key)
+  })
+
+  return dups;
+
+}
+
+
+/**********
+ * FETCH ALL CONTACTS *
+ **********/
+const fetchAllContacts = async () => {
+
+  let page = 1;
+  let contacts = []
+  while(page !== 0 ){
+    let url = `https://geophysicalinsights.freshsales.io/api/contacts/view/2000309248?sort=emails&sort_type=asc&page=${page}`;
+    let response = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Accept: '*/*',
+        Host: 'geophysicalinsights.freshsales.io',
+        'accept-encoding': 'gzip, deflate, br',
+        Authorization: 'Token token=ruf8KPf1yojVDU8wBczyzg',
+        'Content-Type': 'text/plain'
+      },
+    });
+    const data = await response.json();
+    contacts = [...contacts, ...data.contacts]
+
+    if(page === data.meta.total_pages){
+      page = 0;
+    }else{
+      page++;
+    }
+  }
+  //now we have all the CONTACTS
+
+  let keys = findDuplicates(contacts, "contacts");
+
+  return keys;
+
+  // console.log('async data', data)
+  // console.log('data.meta', data.meta.total_pages)
+}
+
+
+/**********
+ * FETCH ALL LEADS *
+ **********/
+const fetchAllLeads = async () => {
+
+  let page = 1;
+  let leads = []
+  while(page !== 0 ){
+    let url = `https://geophysicalinsights.freshsales.io/api/leads/view/2000309239?sort=emails&sort_type=asc&page=${page}`;
+    let response = await fetch(url, {
+      credentials: 'include',
+      headers: {
+        Accept: '*/*',
+        Host: 'geophysicalinsights.freshsales.io',
+        'accept-encoding': 'gzip, deflate, br',
+        Authorization: 'Token token=ruf8KPf1yojVDU8wBczyzg',
+        'Content-Type': 'text/plain'
+      },
+    });
+    const data = await response.json();
+    // console.log(data)
+    leads = [...leads, ...data.leads]
+
+    //uncomment here to test 1 page
+    // page = 0;
+    // page++
+
+    if(page === data.meta.total_pages){
+      page = 0;
+    }else{
+      page++;
+    }
+  }
+  //now we have all the LEADS
+
+  let keys = findDuplicates(leads, "contacts");
+
+  return keys;
+
+  // console.log('async data', data)
+  // console.log('data.meta', data.meta.total_pages)
+}
+/**********
+ * SCRIPT *
+ **********/
+
+  // fetchAllLeads();
+
+ cron.schedule("* * 21 * *", () => {
+   console.log("running a task every minute");
+
+   //look for duplicates in contacts
+   // fetchAllContacts();
+ })
+
 
 
 /**********
